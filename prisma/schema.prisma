@@ -41,4 +41,35 @@ model QRCode {
   destination      String
   scans            Int      @default(0)
   createdAt        DateTime @default(now())
+  scanLogs         ScanLog[]
+  
+  // Design Customization Fields
+  foregroundColor  String?  @default("#000000")
+  backgroundColor  String?  @default("#FFFFFF")
+  logoUrl          String?
+  frameStyle       String?  @default("square")
+  callToAction     String?  @default("Scan to Shop")
+  cornerRadius     Int?     @default(0)
+  dotStyle         String?  @default("square")
+  eyeStyle         String?  @default("square")
+  gradientType     String?
+  gradientColor1   String?
+  gradientColor2   String?
+}
+
+model ScanLog {
+  id          String   @id @default(cuid())
+  qrCodeId    String
+  qrCode      QRCode   @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
+  scannedAt   DateTime @default(now())
+  userAgent   String?
+  deviceType  String?
+  browser     String?
+  os          String?
+  ipAddress   String?
+  country     String?
+  city        String?
+  region      String?
+  latitude    Float?
+  longitude   Float?
 }

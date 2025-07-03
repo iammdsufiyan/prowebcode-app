@@ -3,7 +3,7 @@
 client_id = "a8e1d4c58ccbc5cd44a65d7354375a2b"
 name = "prowebcode-app"
 handle = "prowebcode-app"
-application_url = "https://offset-injury-walker-soma.trycloudflare.com"
+application_url = "https://compiler-reconstruction-categories-mailto.trycloudflare.com"
 embedded = true
 
 [build]
@@ -26,7 +26,7 @@ api_version = "2025-04"
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://offset-injury-walker-soma.trycloudflare.com/auth/callback", "https://offset-injury-walker-soma.trycloudflare.com/auth/shopify/callback", "https://offset-injury-walker-soma.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://compiler-reconstruction-categories-mailto.trycloudflare.com/auth/callback", "https://compiler-reconstruction-categories-mailto.trycloudflare.com/auth/shopify/callback", "https://compiler-reconstruction-categories-mailto.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false

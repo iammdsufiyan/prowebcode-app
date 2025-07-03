@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Design Customization Test</title>
+    <script src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .preview {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input[type="color"] {
+            height: 40px;
+            padding: 2px;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        .color-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .gradient-controls {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .gradient-controls.show {
+            display: grid;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #555;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .download-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .download-btn:hover {
+            background: #0056b3;
+        }
+        #qrcode {
+            margin: 20px 0;
+        }
+        .cta-text {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 QR Code Design Customization Demo</h1>
+    
+    <div class="container">
+        <div class="controls">
+            <h2>Design Controls</h2>
+            
+            <div class="form-group">
+                <label for="url">URL to encode:</label>
+                <input type="text" id="url" value="https://example.com/product/123" placeholder="Enter URL">
+            </div>
+            
+            <div class="form-group color-group">
+                <div>
+                    <label for="foregroundColor">Foreground Color:</label>
+                    <input type="color" id="foregroundColor" value="#000000">
+                </div>
+                <div>
+                    <label for="backgroundColor">Background Color:</label>
+                    <input type="color" id="backgroundColor" value="#FFFFFF">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="callToAction">Call to Action Text:</label>
+                <input type="text" id="callToAction" value="Scan to Shop" placeholder="e.g., Scan Me, Get Product Info">
+            </div>
+            
+            <div class="form-group color-group">
+                <div>
+                    <label for="frameStyle">Frame Style:</label>
+                    <select id="frameStyle">
+                        <option value="square">Square</option>
+                        <option value="rounded">Rounded</option>
+                        <option value="circle">Circle</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="dotStyle">Dot Style:</label>
+                    <select id="dotStyle">
+                        <option value="square">Square</option>
+                        <option value="rounded">Rounded</option>
+                        <option value="circle">Circle</option>
+                        <option value="diamond">Diamond</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group color-group">
+                <div>
+                    <label for="eyeStyle">Eye Style:</label>
+                    <select id="eyeStyle">
+                        <option value="square">Square</option>
+                        <option value="rounded">Rounded</option>
+                        <option value="circle">Circle</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="cornerRadius">Corner Radius: <span id="cornerRadiusValue">0</span>px</label>
+                    <input type="range" id="cornerRadius" min="0" max="50" value="0">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="logoUrl">Logo URL (Optional):</label>
+                <input type="text" id="logoUrl" placeholder="https://example.com/logo.png">
+            </div>
+            
+            <div class="form-group">
+                <label for="gradientType">Gradient Type:</label>
+                <select id="gradientType">
+                    <option value="">None</option>
+                    <option value="linear">Linear</option>
+                    <option value="radial">Radial</option>
+                </select>
+            </div>
+            
+            <div class="gradient-controls" id="gradientControls">
+                <div>
+                    <label for="gradientColor1">Gradient Color 1:</label>
+                    <input type="color" id="gradientColor1" value="#000000">
+                </div>
+                <div>
+                    <label for="gradientColor2">Gradient Color 2:</label>
+                    <input type="color" id="gradientColor2" value="#666666">
+                </div>
+            </div>
+        </div>
+        
+        <div class="preview">
+            <h2>Live Preview</h2>
+            <div id="qrcode"></div>
+            <div class="cta-text" id="ctaDisplay">Scan to Shop</div>
+            <button class="download-btn" onclick="downloadQR()">Download QR Code</button>
+        </div>
+    </div>
+
+    <script>
+        let qrCode;
+        
+        function initQRCode() {
+            qrCode = new QRCodeStyling({
+                width: 300,
+                height: 300,
+                type: "svg",
+                data: document.getElementById('url').value,
+                dotsOptions: {
+                    color: "#000000",
+                    type: "square"
+                },
+                backgroundOptions: {
+                    color: "#FFFFFF",
+                },
+                cornersSquareOptions: {
+                    color: "#000000",
+                    type: "square"
+                },
+                cornersDotOptions: {
+                    color: "#000000",
+                    type: "square"
+                }
+            });
+            
+            qrCode.append(document.getElementById("qrcode"));
+        }
+        
+        function updateQRCode() {
+            const url = document.getElementById('url').value;
+            const foregroundColor = document.getElementById('foregroundColor').value;
+            const backgroundColor = document.getElementById('backgroundColor').value;
+            const frameStyle = document.getElementById('frameStyle').value;
+            const dotStyle = document.getElementById('dotStyle').value;
+            const eyeStyle = document.getElementById('eyeStyle').value;
+            const cornerRadius = parseInt(document.getElementById('cornerRadius').value);
+            const logoUrl = document.getElementById('logoUrl').value;
+            const gradientType = document.getElementById('gradientType').value;
+            const gradientColor1 = document.getElementById('gradientColor1').value;
+            const gradientColor2 = document.getElementById('gradientColor2').value;
+            const callToAction = document.getElementById('callToAction').value;
+            
+            // Update CTA display
+            document.getElementById('ctaDisplay').textContent = callToAction || 'Scan to Shop';
+            
+            // Show/hide gradient controls
+            const gradientControls = document.getElementById('gradientControls');
+            if (gradientType) {
+                gradientControls.classList.add('show');
+            } else {
+                gradientControls.classList.remove('show');
+            }
+            
+            // Update corner radius display
+            document.getElementById('cornerRadiusValue').textContent = cornerRadius;
+            
+            // Configure QR code options
+            const options = {
+                width: 300,
+                height: 300,
+                type: "svg",
+                data: url,
+                dotsOptions: {
+                    color: gradientType ? 
+                        {
+                            type: gradientType,
+                            rotation: 0,
+                            colorStops: [
+                                { offset: 0, color: gradientColor1 },
+                                { offset: 1, color: gradientColor2 }
+                            ]
+                        } : foregroundColor,
+                    type: dotStyle
+                },
+                backgroundOptions: {
+                    color: backgroundColor,
+                },
+                cornersSquareOptions: {
+                    color: foregroundColor,
+                    type: eyeStyle
+                },
+                cornersDotOptions: {
+                    color: foregroundColor,
+                    type: eyeStyle
+                }
+            };
+            
+            // Add logo if provided
+            if (logoUrl) {
+                options.imageOptions = {
+                    crossOrigin: "anonymous",
+                    margin: 10
+                };
+                options.image = logoUrl;
+            }
+            
+            // Apply corner radius for frame
+            if (frameStyle !== 'none' && cornerRadius > 0) {
+                options.cornersSquareOptions.type = frameStyle;
+                options.cornersDotOptions.type = frameStyle;
+            }
+            
+            qrCode.update(options);
+        }
+        
+        function downloadQR() {
+            qrCode.download({ name: "custom-qr-code", extension: "png" });
+        }
+        
+        // Initialize QR code on page load
+        window.onload = function() {
+            initQRCode();
+            
+            // Add event listeners to all controls
+            const controls = ['url', 'foregroundColor', 'backgroundColor', 'frameStyle', 'dotStyle', 'eyeStyle', 'cornerRadius', 'logoUrl', 'gradientType', 'gradientColor1', 'gradientColor2', 'callToAction'];
+            
+            controls.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', updateQRCode);
+                    element.addEventListener('change', updateQRCode);
+                }
+            });
+            
+            // Initial update
+            updateQRCode();
+        };
+    </script>
+</body>
+</html>

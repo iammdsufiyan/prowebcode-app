@@ -3,7 +3,15 @@ import invariant from "tiny-invariant";
 import db from '../db.server';
 
 export async function getQRCode(id, graphql) {
-  const qrCode = await db.qRCode.findFirst({ where: { id } });
+  const qrCode = await db.qRCode.findFirst({
+    where: { id },
+    include: {
+      scanLogs: {
+        orderBy: { scannedAt: 'desc' },
+        take: 10 // Get last 10 scans for quick preview
+      }
+    }
+  });
 
   if (!qrCode) {
     return null;
@@ -16,6 +24,12 @@ export async function getQRCodes(shop, graphql) {
   const qrCodes = await db.qRCode.findMany({
     where: { shop },
     orderBy: { id: "desc" },
+    include: {
+      scanLogs: {
+        orderBy: { scannedAt: 'desc' },
+        take: 5 // Get last 5 scans for overview
+      }
+    }
   });
 
   if (qrCodes.length === 0) return [];
@@ -25,9 +39,53 @@ export async function getQRCodes(shop, graphql) {
   );
 }
 
-export function getQRCodeImage(id) {
+export function getQRCodeImage(id, customization = {}) {
   const url = new URL(`/qrcodes/${id}/scan`, process.env.SHOPIFY_APP_URL);
-  return qrcode.toDataURL(url.href);
+  
+  // For now, use the basic qrcode library with some customization
+  const options = {
+    errorCorrectionLevel: 'M',
+    type: 'image/png',
+    quality: 0.92,
+    margin: 1,
+    color: {
+      dark: customization.foregroundColor || '#000000',
+      light: customization.backgroundColor || '#FFFFFF'
+    },
+    width: 156
+  };
+  
+  return qrcode.toDataURL(url.href, options);
+}
+
+export async function getCustomQRCodeImage(id, customization = {}) {
+  const url = new URL(`/qrcodes/${id}/scan`, process.env.SHOPIFY_APP_URL);
+  
+  // Enhanced QR code generation with logo support
+  const options = {
+    errorCorrectionLevel: customization.logoUrl ? 'H' : 'M', // High error correction for logos
+    type: 'image/png',
+    quality: 0.92,
+    margin: 1,
+    color: {
+      dark: customization.foregroundColor || '#000000',
+      light: customization.backgroundColor || '#FFFFFF'
+    },
+    width: 300
+  };
+  
+  // Generate base QR code
+  const qrDataUrl = await qrcode.toDataURL(url.href, options);
+  
+  // If no logo, return basic QR code
+  if (!customization.logoUrl) {
+    return qrDataUrl;
+  }
+  
+  // If logo is provided, we'll need to composite it
+  // For now, return the basic version with a note
+  // TODO: Implement server-side logo compositing using Canvas or similar
+  return qrDataUrl;
 }
 
 export function getDestinationUrl(qrCode) {
@@ -42,7 +100,21 @@ export function getDestinationUrl(qrCode) {
 }
 
 async function supplementQRCode(qrCode, graphql) {
-  const qrCodeImagePromise = getQRCodeImage(qrCode.id);
+  const customization = {
+    foregroundColor: qrCode.foregroundColor,
+    backgroundColor: qrCode.backgroundColor,
+    logoUrl: qrCode.logoUrl,
+    frameStyle: qrCode.frameStyle,
+    callToAction: qrCode.callToAction,
+    cornerRadius: qrCode.cornerRadius,
+    dotStyle: qrCode.dotStyle,
+    eyeStyle: qrCode.eyeStyle,
+    gradientType: qrCode.gradientType,
+    gradientColor1: qrCode.gradientColor1,
+    gradientColor2: qrCode.gradientColor2,
+  };
+  
+  const qrCodeImagePromise = getQRCodeImage(qrCode.id, customization);
 
   const response = await graphql(
     `

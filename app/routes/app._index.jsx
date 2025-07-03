@@ -64,6 +64,7 @@ const QRTable = ({ qrCodes, selectedResources, onSelectionChange }) => (
       { title: "Product" },
       { title: "Date created" },
       { title: "Scans" },
+      { title: "Recent Activity" },
     ]}
     selectable={true}
   >
@@ -73,38 +74,58 @@ const QRTable = ({ qrCodes, selectedResources, onSelectionChange }) => (
   </IndexTable>
 );
 
-const QRTableRow = ({ qrCode }) => (
-  <IndexTable.Row id={qrCode.id} position={qrCode.id}>
-    <IndexTable.Cell>
-      <Thumbnail
-        source={qrCode.productImage || ImageIcon}
-        alt={qrCode.productTitle}
-        size="small"
-      />
-    </IndexTable.Cell>
-    <IndexTable.Cell>
-      <Link to={`qrcodes/${qrCode.id}`}>{truncate(qrCode.title)}</Link>
-    </IndexTable.Cell>
-    <IndexTable.Cell>
-      {qrCode.productDeleted ? (
-        <InlineStack align="start" gap="200">
-          <span style={{ width: "20px" }}>
-            <Icon source={AlertDiamondIcon} tone="critical" />
-          </span>
-          <Text tone="critical" as="span">
-            product has been deleted
+const QRTableRow = ({ qrCode }) => {
+  const recentScan = qrCode.scanLogs && qrCode.scanLogs.length > 0 ? qrCode.scanLogs[0] : null;
+  
+  return (
+    <IndexTable.Row id={qrCode.id} position={qrCode.id}>
+      <IndexTable.Cell>
+        <Thumbnail
+          source={qrCode.productImage || ImageIcon}
+          alt={qrCode.productTitle}
+          size="small"
+        />
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        <Link to={`qrcodes/${qrCode.id}`}>{truncate(qrCode.title)}</Link>
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        {qrCode.productDeleted ? (
+          <InlineStack align="start" gap="200">
+            <span style={{ width: "20px" }}>
+              <Icon source={AlertDiamondIcon} tone="critical" />
+            </span>
+            <Text tone="critical" as="span">
+              product has been deleted
+            </Text>
+          </InlineStack>
+        ) : (
+          truncate(qrCode.productTitle)
+        )}
+      </IndexTable.Cell>
+      <IndexTable.Cell>
+        {new Date(qrCode.createdAt).toDateString()}
+      </IndexTable.Cell>
+      <IndexTable.Cell>{qrCode.scans}</IndexTable.Cell>
+      <IndexTable.Cell>
+        {recentScan ? (
+          <InlineStack gap="100">
+            <Text as="span" variant="bodySm">
+              {recentScan.deviceType || 'Unknown'}
+            </Text>
+            <Text as="span" variant="bodySm" tone="subdued">
+              from {recentScan.city || 'Unknown'}
+            </Text>
+          </InlineStack>
+        ) : (
+          <Text as="span" variant="bodySm" tone="subdued">
+            No scans yet
           </Text>
-        </InlineStack>
-      ) : (
-        truncate(qrCode.productTitle)
-      )}
-    </IndexTable.Cell>
-    <IndexTable.Cell>
-      {new Date(qrCode.createdAt).toDateString()}
-    </IndexTable.Cell>
-    <IndexTable.Cell>{qrCode.scans}</IndexTable.Cell>
-  </IndexTable.Row>
-);
+        )}
+      </IndexTable.Cell>
+    </IndexTable.Row>
+  );
+};
 
 export default function Index() {
   const { qrCodes } = useLoaderData();
@@ -127,6 +148,8 @@ export default function Index() {
     }
 
     try {
+      console.log("Starting download for IDs:", selectedIds);
+      
       const formData = new FormData();
       formData.append("selectedIds", JSON.stringify(selectedIds));
 
@@ -135,8 +158,17 @@ export default function Index() {
         body: formData,
       });
 
+      console.log("Response status:", response.status);
+
       if (response.ok) {
         const blob = await response.blob();
+        console.log("Blob size:", blob.size);
+        
+        if (blob.size === 0) {
+          alert("No QR code images found to download");
+          return;
+        }
+        
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -145,19 +177,30 @@ export default function Index() {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
+        
+        console.log("Download completed successfully");
       } else {
-        alert("Failed to download QR codes");
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        console.error("Download failed:", errorData);
+        alert(`Failed to download QR codes: ${errorData.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Download error:", error);
-      alert("Failed to download QR codes");
+      alert(`Failed to download QR codes: ${error.message}`);
     }
   };
 
   const selectedCount = selectedResources === "All" ? qrCodes.length : selectedResources.length;
 
   const handleDownloadAll = async () => {
+    if (qrCodes.length === 0) {
+      alert("No QR codes available to download");
+      return;
+    }
+
     try {
+      console.log("Starting download all QR codes");
+      
       const formData = new FormData();
       formData.append("selectedIds", JSON.stringify([])); // Empty array means download all
 
@@ -166,8 +209,17 @@ export default function Index() {
         body: formData,
       });
 
+      console.log("Response status:", response.status);
+
       if (response.ok) {
         const blob = await response.blob();
+        console.log("Blob size:", blob.size);
+        
+        if (blob.size === 0) {
+          alert("No QR code images found to download");
+          return;
+        }
+        
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -176,12 +228,16 @@ export default function Index() {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
+        
+        console.log("Download all completed successfully");
       } else {
-        alert("Failed to download QR codes");
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        console.error("Download all failed:", errorData);
+        alert(`Failed to download QR codes: ${errorData.error || "Unknown error"}`);
       }
     } catch (error) {
-      console.error("Download error:", error);
-      alert("Failed to download QR codes");
+      console.error("Download all error:", error);
+      alert(`Failed to download QR codes: ${error.message}`);
     }
   };
 
@@ -190,6 +246,9 @@ export default function Index() {
       <ui-title-bar title="QR codes">
         <button variant="primary" onClick={() => navigate("/app/qrcodes/new")}>
           Create QR code
+        </button>
+        <button variant="secondary" onClick={() => navigate("/app/qrcodes/bulk-create")}>
+          Bulk Create by Product Names
         </button>
         {qrCodes.length > 0 && (
           <button variant="secondary" onClick={handleDownloadAll}>

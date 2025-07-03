@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test QR Code Scan Analytics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .qr-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .analytics-demo {
+            background: #f3e5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .device-info {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 QR Code Scan Analytics Test</h1>
+        
+        <div class="qr-info">
+            <h3>📱 What Gets Tracked When You Scan a QR Code:</h3>
+            <ul>
+                <li><strong>Device Type:</strong> Mobile, Tablet, or Desktop</li>
+                <li><strong>Browser:</strong> Chrome, Safari, Firefox, Edge, etc.</li>
+                <li><strong>Operating System:</strong> iOS, Android, Windows, macOS, Linux</li>
+                <li><strong>Location:</strong> Country, City, Region (based on IP)</li>
+                <li><strong>Timestamp:</strong> When the scan occurred</li>
+                <li><strong>IP Address:</strong> For location detection</li>
+            </ul>
+        </div>
+
+        <div class="device-info">
+            <h4>Your Current Device Info:</h4>
+            <p><strong>User Agent:</strong> <span id="userAgent"></span></p>
+            <p><strong>Screen Size:</strong> <span id="screenSize"></span></p>
+            <p><strong>Platform:</strong> <span id="platform"></span></p>
+        </div>
+
+        <div class="analytics-demo">
+            <h3>📊 Analytics Features Added:</h3>
+            <ul>
+                <li>✅ Device type detection (Mobile/Tablet/Desktop)</li>
+                <li>✅ Browser identification</li>
+                <li>✅ Operating system detection</li>
+                <li>✅ Geographic location tracking</li>
+                <li>✅ Scan timestamp logging</li>
+                <li>✅ Analytics dashboard in admin panel</li>
+                <li>✅ Recent activity display in QR code list</li>
+                <li>✅ Detailed scan logs for each QR code</li>
+            </ul>
+        </div>
+
+        <h3>🎯 How to Test:</h3>
+        <ol>
+            <li>Create a QR code in your Shopify app</li>
+            <li>Scan it with different devices (phone, tablet, computer)</li>
+            <li>Check the admin panel to see analytics data</li>
+            <li>View detailed scan logs in the QR code details page</li>
+        </ol>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="http://localhost:57005/app" class="button">
+                🚀 Go to QR Code App
+            </a>
+            <a href="https://booksss12345.myshopify.com/admin/oauth/redirect_from_cli?client_id=a8e1d4c58ccbc5cd44a65d7354375a2b" class="button">
+                🔗 Direct App Link
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Display current device information
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        document.getElementById('screenSize').textContent = `${screen.width}x${screen.height}`;
+        document.getElementById('platform').textContent = navigator.platform;
+    </script>
+</body>
+</html>
